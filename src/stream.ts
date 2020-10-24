@@ -190,12 +190,11 @@ export class LocalStream {
       prev.stop();
 
       if (this.pc) {
-        this.pc.getSenders().forEach(async (sender: RTCRtpSender) => {
-          if (sender?.track?.kind === next.kind) {
-            sender.track?.stop();
-            sender.replaceTrack(next);
-          }
-        });
+        const sender = this.pc.getSenders().find((sender: RTCRtpSender) => sender?.track?.kind === next.kind);
+        if (sender) {
+          sender.track?.stop();
+          sender.replaceTrack(next);
+        }
       }
     } else {
       this.stream.addTrack(next);
@@ -216,6 +215,9 @@ export class LocalStream {
       this.pc.getSenders().forEach(async (sender: RTCRtpSender) => {
         if (sender.track && this.stream.getTracks().includes(sender.track)) {
           this.pc!.removeTrack(sender);
+          this.pc!.getTransceivers()
+            .find((t) => t.sender == sender)
+            ?.stop();
         }
       });
     }
