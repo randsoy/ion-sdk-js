@@ -112,11 +112,10 @@ export default class Client {
 
     const offer = await this.transports[Role.pub].pc.createOffer();
     await this.transports[Role.pub].pc.setLocalDescription(offer);
-    const answer = await this.signal.join(sid, offer);
-
-    await this.transports[Role.pub].pc.setRemoteDescription(answer);
     this.transports[Role.pub].candidates.forEach((c) => this.transports![Role.pub].pc.addIceCandidate(c));
     this.transports[Role.pub].pc.onnegotiationneeded = this.onNegotiationNeeded.bind(this);
+    const answer = await this.signal.join(sid, offer);
+    await this.transports[Role.pub].pc.setRemoteDescription(answer);
   }
 
   leave() {
